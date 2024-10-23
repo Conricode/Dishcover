@@ -8,17 +8,17 @@
         /* General styles */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f8f5e0; /* Beige background */
+            background-color: #d8c7b6; /* Sandy beige background */
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #333; /* Dark text color */
+            color: #3b3b3b; /* Dark gray text */
         }
 
         h1 {
-            color: #1f4d25; /* Dark green */
+            color: #5a3e32; /* Dark brown */
             margin-bottom: 20px;
         }
 
@@ -26,14 +26,14 @@
         input[type="text"] {
             padding: 10px;
             font-size: 16px;
-            border: 2px solid #1f4d25; /* Dark green border */
+            border: 2px solid #5a3e32; /* Dark brown border */
             border-radius: 5px;
             margin-right: 10px;
             width: 250px;
         }
 
         button {
-            background-color: #1f4d25; /* Dark green */
+            background-color: #5a3e32; /* Dark brown */
             color: white;
             padding: 10px 15px;
             border: none;
@@ -44,14 +44,14 @@
         }
 
         button:hover {
-            background-color: #a4c8c8; /* Light green on hover */
+            background-color: #cba560; /* Light beige on hover */
         }
 
         /* Feedback and hints */
         #feedback {
             margin-top: 15px;
             font-weight: bold;
-            color: #1f4d25; /* Dark green */
+            color: #5a3e32; /* Dark brown */
         }
 
         /* Ingredient List */
@@ -63,7 +63,7 @@
 
         #ingredient-list li {
             background-color: white;
-            border: 1px solid #1f4d25; /* Dark green border */
+            border: 1px solid #5a3e32; /* Dark brown border */
             border-radius: 5px;
             padding: 10px;
             margin: 5px 0;
@@ -71,7 +71,7 @@
         }
 
         #ingredient-list li:hover {
-            background-color: #e2f2e2; /* Light beige on hover */
+            background-color: #e2d8d1; /* Light sandy beige on hover */
         }
 
         /* Result Section */
@@ -89,7 +89,7 @@
         }
 
         a {
-            color: #1f4d25; /* Dark green for links */
+            color: #5a3e32; /* Dark brown for links */
             text-decoration: none;
             font-weight: bold;
         }
@@ -106,7 +106,7 @@
 
         .dropdown-list {
             position: absolute;
-            border: 1px solid #1f4d25; /* Dark green */
+            border: 1px solid #5a3e32; /* Dark brown */
             background: white;
             z-index: 1000;
             width: 100%;
@@ -122,7 +122,7 @@
         }
 
         .dropdown-list div:hover {
-            background-color: #e2f2e2; /* Light beige on hover */
+            background-color: #e2d8d1; /* Light sandy beige on hover */
         }
     </style>
 </head>
@@ -254,4 +254,38 @@
                                 dropdownList.appendChild(suggestionItem);
                             });
                         }
-                        dropdownList.style.display = data.meals ? 'block' : 'none';
+                        dropdownList.style.display = data.meals ? 'block' : 'none'; // Show dropdown if there are suggestions
+                    })
+                    .catch(error => {
+                        console.error('Error fetching recipe suggestions:', error);
+                    });
+            }
+
+            // Event listeners
+            guessInput.addEventListener('input', (e) => {
+                const query = e.target.value;
+                if (query.length > 0) {
+                    fetchRecipeSuggestions(query); // Fetch suggestions based on input
+                } else {
+                    dropdownList.style.display = 'none'; // Hide dropdown if input is empty
+                }
+            });
+
+            submitGuess.addEventListener('click', () => {
+                if (isFirstReveal) {
+                    displayNextIngredient(); // Display the first ingredient
+                    isFirstReveal = false; // Update the flag
+                    submitGuess.textContent = 'Submit Guess'; // Change button text after first reveal
+                } else {
+                    const guess = guessInput.value.trim();
+                    checkGuess(guess); // Check player's guess
+                }
+            });
+
+            hintButton.addEventListener('click', provideRecipeHint);
+            giveUpButton.addEventListener('click', showRecipe);
+            fetchRandomRecipe(); // Start the game with a random recipe
+        });
+    </script>
+</body>
+</html>
