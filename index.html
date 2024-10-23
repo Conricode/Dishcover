@@ -38,7 +38,7 @@
         /* Input and Button Styles */
         .input-container {
             display: flex;
-            align-items: center;
+            align-items: stretch; /* Align items to stretch */
             margin-bottom: 15px;
         }
 
@@ -49,17 +49,19 @@
             border-radius: 5px;
             margin-right: 10px;
             width: 250px;
+            flex-grow: 1; /* Allow input to grow */
         }
 
         button {
             background-color: #cba560; /* Button color */
             color: white; /* White text */
-            padding: 10px 15px;
+            padding: 10px; /* Make padding consistent */
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            height: 46px; /* Match height to input field */
         }
 
         button:hover {
@@ -216,18 +218,16 @@
                         ingredientHint.textContent = 'Hint: Guess to reveal ingredients!';
                         submitGuess.textContent = 'Reveal First Ingredient'; // Reset button text
                         dropdownList.style.display = 'none'; // Hide dropdown
+                        populateDropdown(); // Populate dropdown with ingredients
                     })
                     .catch(error => {
                         console.error('Error fetching recipe:', error);
                     });
             }
 
-            // Display the next ingredient and keep it on the screen
-            function displayNextIngredient() {
-                const ingredientName = currentRecipe[`strMeal`].toLowerCase();
-                let ingredients = [];
-
-                // Collecting ingredients
+            // Populate dropdown with ingredients
+            function populateDropdown() {
+                const ingredients = [];
                 for (let i = 0; i < maxIngredients; i++) {
                     const ingredient = currentRecipe[`strIngredient${i + 1}`];
                     if (ingredient) {
@@ -235,23 +235,54 @@
                     }
                 }
 
-                // Filter ingredients: first, show those not in the recipe name, then those in the name
-                const notInName = ingredients.filter(ing => !ingredientName.includes(ing.toLowerCase()));
-                const inName = ingredients.filter(ing => ingredientName.includes(ing.toLowerCase()));
+                dropdownList.innerHTML = '';
+                ingredients.forEach(ingredient => {
+                    const div = document.createElement('div');
+                    div.textContent = ingredient;
+                    div.addEventListener('click', () => {
+                        guessInput.value = ingredient; // Set input value to the clicked ingredient
+                        dropdownList.style.display = 'none'; // Hide dropdown
+                    });
+                    dropdownList.appendChild(div);
+                });
+            }
 
-                // Display the next ingredient if available
-                if (ingredientIndex < notInName.length) {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Ingredient: ${notInName[ingredientIndex]}`;
-                    ingredientList.appendChild(listItem);
-                } else if (ingredientIndex - notInName.length < inName.length) {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Ingredient: ${inName[ingredientIndex - notInName.length]}`;
-                    ingredientList.appendChild(listItem);
-                } else {
-                    ingredientHint.textContent = 'No more ingredients! Give your best guess or give up!';
+            // Show dropdown when typing
+            guessInput.addEventListener('input', () => {
+                const inputText = guessInput.value.toLowerCase();
+                const items = dropdownList.getElementsByTagName('div');
+                let hasMatch = false;
+
+                for (let item of items) {
+                    if (item.textContent.toLowerCase().includes(inputText)) {
+                        item.style.display = 'block'; // Show matching items
+                        hasMatch = true;
+                    } else {
+                        item.style.display = 'none'; // Hide non-matching items
+                    }
                 }
-                ingredientIndex++;
+
+                dropdownList.style.display = hasMatch ? 'block' : 'none'; // Show or hide dropdown
+            });
+
+            // Reveal the next ingredient
+            function displayNextIngredient() {
+                const ingredients = [];
+                for (let i = 0; i < maxIngredients; i++) {
+                    const ingredient = currentRecipe[`strIngredient${i + 1}`];
+                    if (ingredient) {
+                        ingredients.push(ingredient);
+                    }
+                }
+
+                if (ingredientIndex < ingredients.length) {
+                    const li = document.createElement('li');
+                    li.textContent = ingredients[ingredientIndex];
+                    ingredientList.appendChild(li);
+                    ingredientIndex++;
+                } else {
+                    feedback.textContent = 'No more ingredients to reveal!';
+                }
             }
 
             // Check if the guess is correct
@@ -264,6 +295,7 @@
                     feedback.textContent = 'Try again or get a hint!';
                 }
                 guessInput.value = ''; // Clear input
+                dropdownList.style.display = 'none'; // Hide dropdown after guess
             }
 
             // Handle button click events
