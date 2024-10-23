@@ -182,137 +182,138 @@
     </div>
 
     <script>
-        const apiKey = '1';  // You can register at themealdb.com to get an API key
-        let currentRecipe = null;
-        let ingredientIndex = 0;
-        let maxIngredients = 20;
-        let guessedRecipes = new Set(); // Track guessed recipes
-        let isFirstReveal = true; // Flag to check if it's the first reveal
+    const apiKey = '1';  // You can register at themealdb.com to get an API key
+    let currentRecipe = null;
+    let ingredientIndex = 0;
+    let maxIngredients = 20;
+    let guessedRecipes = new Set(); // Track guessed recipes
+    let isFirstReveal = true; // Flag to check if it's the first reveal
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const submitGuess = document.getElementById('submit-guess');
-            const guessInput = document.getElementById('guess-input');
-            const feedback = document.getElementById('feedback');
-            const ingredientHint = document.getElementById('ingredient-hint');
-            const ingredientList = document.getElementById('ingredient-list');
-            const resultDiv = document.getElementById('result');
-            const recipeNameElem = document.getElementById('recipe-name');
-            const recipeImageElem = document.getElementById('recipe-image');
-            const recipeInstructionsElem = document.getElementById('recipe-instructions');
-            const recipeVideoElem = document.getElementById('recipe-video');
-            const hintButton = document.getElementById('hint-button');
-            const giveUpButton = document.getElementById('give-up');
-            const dropdownList = document.getElementById('dropdown-list');
+    document.addEventListener('DOMContentLoaded', () => {
+        const submitGuess = document.getElementById('submit-guess');
+        const guessInput = document.getElementById('guess-input');
+        const feedback = document.getElementById('feedback');
+        const ingredientHint = document.getElementById('ingredient-hint');
+        const ingredientList = document.getElementById('ingredient-list');
+        const resultDiv = document.getElementById('result');
+        const recipeNameElem = document.getElementById('recipe-name');
+        const recipeImageElem = document.getElementById('recipe-image');
+        const recipeInstructionsElem = document.getElementById('recipe-instructions');
+        const recipeVideoElem = document.getElementById('recipe-video');
+        const hintButton = document.getElementById('hint-button');
+        const giveUpButton = document.getElementById('give-up');
+        const dropdownList = document.getElementById('dropdown-list');
 
-            // Fetch a random recipe from TheMealDB
-function fetchRandomRecipe() {
-    fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
-        .then(response => response.json())
-        .then(data => {
-            currentRecipe = data.meals[0];
-            ingredientIndex = 0;
-            ingredientList.innerHTML = ''; // Clear previous ingredients
-            feedback.textContent = ''; // Clear feedback
-            ingredientHint.textContent = 'Hint: Guess to reveal ingredients!';
-            dropdownList.style.display = 'none'; // Hide dropdown
-            guessedRecipes.clear(); // Clear guessed recipes for new round
+        // Fetch a random recipe from TheMealDB
+        function fetchRandomRecipe() {
+            fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
+                .then(response => response.json())
+                .then(data => {
+                    currentRecipe = data.meals[0];
+                    ingredientIndex = 0;
+                    ingredientList.innerHTML = ''; // Clear previous ingredients
+                    feedback.textContent = ''; // Clear feedback
+                    ingredientHint.textContent = 'Hint: Guess to reveal ingredients!';
+                    dropdownList.style.display = 'none'; // Hide dropdown
+                    guessedRecipes.clear(); // Clear guessed recipes for new round
 
-            // Show the first ingredient by default
-            displayNextIngredient(); // This should now display the first ingredient
-        })
-        .catch(error => {
-            console.error('Error fetching recipe:', error);
-        });
-}
+                    // Show the first ingredient immediately
+                    displayNextIngredient();
+                })
+                .catch(error => {
+                    console.error('Error fetching recipe:', error);
+                });
+        }
 
-            // Display the next ingredient
-            function displayNextIngredient() {
-                if (ingredientIndex < currentRecipe.maxIngredients) {
-                    const ingredientName = currentRecipe.strMeal.toLowerCase();
-                    let ingredients = [];
+        // Display the next ingredient
+        function displayNextIngredient() {
+            if (ingredientIndex < maxIngredients) {
+                const ingredientName = currentRecipe.strMeal.toLowerCase();
+                let ingredients = [];
 
-                    // Collecting ingredients
-                    for (let i = 0; i < maxIngredients; i++) {
-                        const ingredient = currentRecipe[`strIngredient${i + 1}`];
-                        if (ingredient) {
-                            ingredients.push(ingredient);
-                        }
+                // Collecting ingredients
+                for (let i = 0; i < maxIngredients; i++) {
+                    const ingredient = currentRecipe[`strIngredient${i + 1}`];
+                    if (ingredient) {
+                        ingredients.push(ingredient);
                     }
+                }
 
-                    // Filter ingredients
-                    const notInName = ingredients.filter(ing => !ingredientName.includes(ing.toLowerCase()));
-                    const inName = ingredients.filter(ing => ingredientName.includes(ing.toLowerCase()));
+                // Filter ingredients
+                const notInName = ingredients.filter(ing => !ingredientName.includes(ing.toLowerCase()));
+                const inName = ingredients.filter(ing => ingredientName.includes(ing.toLowerCase()));
 
-                    // Show next ingredient
-                    let listItem;
-                    if (ingredientIndex < notInName.length) {
-                        listItem = document.createElement('li');
-                        listItem.textContent = `Ingredient: ${notInName[ingredientIndex]}`;
-                    } else if (ingredientIndex - notInName.length < inName.length) {
-                        listItem = document.createElement('li');
-                        listItem.textContent = `Ingredient: ${inName[ingredientIndex - notInName.length]}`;
+                // Show next ingredient
+                let listItem;
+                if (ingredientIndex < notInName.length) {
+                    listItem = document.createElement('li');
+                    listItem.textContent = `Ingredient: ${notInName[ingredientIndex]}`;
+                } else if (ingredientIndex - notInName.length < inName.length) {
+                    listItem = document.createElement('li');
+                    listItem.textContent = `Ingredient: ${inName[ingredientIndex - notInName.length]}`;
+                }
+                if (listItem) ingredientList.appendChild(listItem);
+
+                // Update the ingredient index
+                ingredientIndex++;
+            }
+        }
+
+        // Handle guess submission
+        submitGuess.addEventListener('click', () => {
+            const guess = guessInput.value.trim().toLowerCase();
+            if (guess) {
+                if (guessedRecipes.has(guess)) {
+                    feedback.textContent = 'You already guessed that recipe.';
+                } else {
+                    guessedRecipes.add(guess);
+
+                    if (guess === currentRecipe.strMeal.toLowerCase()) {
+                        feedback.textContent = `Congratulations! You guessed it right! It's "${currentRecipe.strMeal}".`;
+                        // Display the recipe instructions and image
+                        displayRecipeResult();
+                    } else {
+                        feedback.textContent = 'Incorrect guess. Try again!';
+                        // Display the next ingredient
+                        displayNextIngredient();
                     }
-                    ingredientList.appendChild(listItem);
-
-                    // Update the ingredient index
-                    ingredientIndex++;
                 }
             }
-
-            // Handle guess submission
-            submitGuess.addEventListener('click', () => {
-                const guess = guessInput.value.trim().toLowerCase();
-                if (guess) {
-                    if (guessedRecipes.has(guess)) {
-                        feedback.textContent = 'You already guessed that recipe.';
-                    } else {
-                        guessedRecipes.add(guess);
-
-                        if (guess === currentRecipe.strMeal.toLowerCase()) {
-                            feedback.textContent = `Congratulations! You guessed it right! It's "${currentRecipe.strMeal}".`;
-                            // Display the recipe instructions and image
-                            displayRecipeResult();
-                        } else {
-                            feedback.textContent = 'Incorrect guess. Try again!';
-                            // Display the next ingredient
-                            displayNextIngredient();
-                        }
-                    }
-                }
-                guessInput.value = ''; // Clear input after submission
-            });
-
-            // Display the recipe result
-            function displayRecipeResult() {
-                recipeNameElem.textContent = currentRecipe.strMeal;
-                recipeImageElem.src = currentRecipe.strMealThumb;
-                recipeInstructionsElem.textContent = currentRecipe.strInstructions.replace(/\\n/g, '\n');
-                recipeVideoElem.href = currentRecipe.strYoutube;
-                resultDiv.style.display = 'block'; // Show the result card
-                document.getElementById('ingredient-hint').style.display = 'none'; // Hide hint after guess
-            }
-
-            // Get hint for the recipe
-            hintButton.addEventListener('click', () => {
-                if (currentRecipe) {
-                    if (isFirstReveal) {
-                        ingredientHint.textContent = `Hint: The first ingredient is ${currentRecipe[`strIngredient1`]}.`;
-                        isFirstReveal = false; // Set flag to false after first reveal
-                    } else {
-                        ingredientHint.textContent = 'No more hints available!';
-                    }
-                }
-            });
-
-            // Handle give-up action
-            giveUpButton.addEventListener('click', () => {
-                feedback.textContent = `The recipe was "${currentRecipe.strMeal}".`;
-                displayRecipeResult(); // Show the recipe result
-            });
-
-            // Start the game by fetching a random recipe
-            fetchRandomRecipe();
+            guessInput.value = ''; // Clear input after submission
         });
-    </script>
+
+        // Display the recipe result
+        function displayRecipeResult() {
+            recipeNameElem.textContent = currentRecipe.strMeal;
+            recipeImageElem.src = currentRecipe.strMealThumb;
+            recipeInstructionsElem.textContent = currentRecipe.strInstructions.replace(/\\n/g, '\n');
+            recipeVideoElem.href = currentRecipe.strYoutube;
+            resultDiv.style.display = 'block'; // Show the result card
+            document.getElementById('ingredient-hint').style.display = 'none'; // Hide hint after guess
+        }
+
+        // Get hint for the recipe
+        hintButton.addEventListener('click', () => {
+            if (currentRecipe) {
+                if (isFirstReveal) {
+                    ingredientHint.textContent = `Hint: The first ingredient is ${currentRecipe[`strIngredient1`]}.`;
+                    isFirstReveal = false; // Set flag to false after first reveal
+                } else {
+                    ingredientHint.textContent = 'No more hints available!';
+                }
+            }
+        });
+
+        // Handle give-up action
+        giveUpButton.addEventListener('click', () => {
+            feedback.textContent = `The recipe was "${currentRecipe.strMeal}".`;
+            displayRecipeResult(); // Show the recipe result
+        });
+
+        // Start the game by fetching a random recipe
+        fetchRandomRecipe();
+    });
+</script>
+
 </body>
 </html>
