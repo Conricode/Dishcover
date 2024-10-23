@@ -8,17 +8,17 @@
         /* General styles */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #d8c7b6; /* Sandy beige background */
+            background-color: white; /* White background */
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #3b3b3b; /* Dark gray text */
+            color: #2e5e2e; /* Forest green text */
         }
 
         h1 {
-            color: #5a3e32; /* Dark brown */
+            color: #2e5e2e; /* Forest green */
             margin-bottom: 20px;
         }
 
@@ -26,15 +26,15 @@
         input[type="text"] {
             padding: 10px;
             font-size: 16px;
-            border: 2px solid #5a3e32; /* Dark brown border */
+            border: 2px solid #2e5e2e; /* Forest green border */
             border-radius: 5px;
             margin-right: 10px;
             width: 250px;
         }
 
         button {
-            background-color: #5a3e32; /* Dark brown */
-            color: white;
+            background-color: #cba560; /* Button color */
+            color: white; /* White text */
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
@@ -44,14 +44,14 @@
         }
 
         button:hover {
-            background-color: #cba560; /* Light beige on hover */
+            background-color: #b39a50; /* Darker beige on hover */
         }
 
         /* Feedback and hints */
         #feedback {
             margin-top: 15px;
             font-weight: bold;
-            color: #5a3e32; /* Dark brown */
+            color: #2e5e2e; /* Forest green */
         }
 
         /* Ingredient List */
@@ -62,8 +62,8 @@
         }
 
         #ingredient-list li {
-            background-color: white;
-            border: 1px solid #5a3e32; /* Dark brown border */
+            background-color: #e0f2e9; /* Light green */
+            border: 1px solid #2e5e2e; /* Forest green border */
             border-radius: 5px;
             padding: 10px;
             margin: 5px 0;
@@ -71,7 +71,7 @@
         }
 
         #ingredient-list li:hover {
-            background-color: #e2d8d1; /* Light sandy beige on hover */
+            background-color: #d3e4db; /* Lighter green on hover */
         }
 
         /* Result Section */
@@ -89,7 +89,7 @@
         }
 
         a {
-            color: #5a3e32; /* Dark brown for links */
+            color: #2e5e2e; /* Forest green for links */
             text-decoration: none;
             font-weight: bold;
         }
@@ -106,7 +106,7 @@
 
         .dropdown-list {
             position: absolute;
-            border: 1px solid #5a3e32; /* Dark brown */
+            border: 1px solid #2e5e2e; /* Forest green */
             background: white;
             z-index: 1000;
             width: 100%;
@@ -122,7 +122,7 @@
         }
 
         .dropdown-list div:hover {
-            background-color: #e2d8d1; /* Light sandy beige on hover */
+            background-color: #d3e4db; /* Lighter green on hover */
         }
     </style>
 </head>
@@ -254,7 +254,7 @@
                                 dropdownList.appendChild(suggestionItem);
                             });
                         }
-                        dropdownList.style.display = data.meals ? 'block' : 'none'; // Show dropdown if there are suggestions
+                        dropdownList.style.display = data.meals ? 'block' : 'none'; // Show/hide dropdown based on suggestions
                     })
                     .catch(error => {
                         console.error('Error fetching recipe suggestions:', error);
