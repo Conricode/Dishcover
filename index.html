@@ -24,6 +24,12 @@
         }
 
         /* Input and Button Styles */
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
         input[type="text"] {
             padding: 10px;
             font-size: 16px;
@@ -125,17 +131,30 @@
         .dropdown-list div:hover {
             background-color: #d3e4db; /* Lighter green on hover */
         }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 250px; /* To match the input field width */
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Guess the Recipe</h1>
 
     <div class="dropdown">
-        <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
+        <div class="input-container">
+            <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
+            <button id="submit-guess">Reveal First Ingredient</button>
+        </div>
+        <div class="button-container">
+            <button id="hint-button">Get Hint</button>
+            <button id="give-up">Give Up</button>
+        </div>
         <div id="dropdown-list" class="dropdown-list"></div>
-        <button id="submit-guess">Reveal First Ingredient</button>
-        <button id="hint-button">Get Hint</button>
-        <button id="give-up">Give Up</button>
     </div>
 
     <p id="feedback"></p>
@@ -238,12 +257,8 @@
                 if (guess.toLowerCase() === currentRecipe.strMeal.toLowerCase()) {
                     feedback.textContent = 'Correct! Here is the recipe:';
                     showRecipe();
-                } else if (ingredientIndex < maxIngredients) {
-                    feedback.textContent = 'Incorrect, try again!';
-                    displayNextIngredient();
                 } else {
-                    feedback.textContent = 'Out of ingredients! Here is the recipe:';
-                    showRecipe();
+                    feedback.textContent = 'Incorrect guess, try again!';
                 }
             }
 
