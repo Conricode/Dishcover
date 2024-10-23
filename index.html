@@ -5,19 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Guessing Game</title>
     <style>
-        /* Simple styling for the game */
+        /* General styles */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f5e0; /* Beige background */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333; /* Dark text color */
         }
-        #result {
-            display: none;
+
+        h1 {
+            color: #1f4d25; /* Dark green */
+            margin-bottom: 20px;
         }
+
+        /* Input and Button Styles */
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #1f4d25; /* Dark green border */
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 250px;
+        }
+
+        button {
+            background-color: #1f4d25; /* Dark green */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #a4c8c8; /* Light green on hover */
+        }
+
+        /* Feedback and hints */
+        #feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #1f4d25; /* Dark green */
+        }
+
+        /* Ingredient List */
         #ingredient-list {
             margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
         }
+
         #ingredient-list li {
+            background-color: white;
+            border: 1px solid #1f4d25; /* Dark green border */
+            border-radius: 5px;
+            padding: 10px;
             margin: 5px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        #ingredient-list li:hover {
+            background-color: #e2f2e2; /* Light beige on hover */
+        }
+
+        /* Result Section */
+        #result {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #recipe-image {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        a {
+            color: #1f4d25; /* Dark green for links */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
