@@ -23,18 +23,6 @@
             margin-bottom: 20px;
         }
 
-        /* Card styles */
-        .card {
-            background-color: #f9f9f9;
-            border: 1px solid #2e5e2e; /* Forest green border */
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin: 15px 0;
-            width: 100%;
-            max-width: 400px; /* Limit width for larger screens */
-        }
-
         /* Input and Button Styles */
         input[type="text"] {
             padding: 10px;
@@ -42,7 +30,7 @@
             border: 2px solid #2e5e2e; /* Forest green border */
             border-radius: 5px;
             margin-right: 10px;
-            width: calc(100% - 130px); /* Adjust width for buttons */
+            width: 250px;
         }
 
         button {
@@ -114,7 +102,7 @@
         /* Dropdown styles */
         .dropdown {
             position: relative;
-            width: 100%;
+            width: 250px;
         }
 
         .dropdown-list {
@@ -137,38 +125,25 @@
         .dropdown-list div:hover {
             background-color: #d3e4db; /* Lighter green on hover */
         }
-
-        /* Responsive styles */
-        @media (max-width: 600px) {
-            input[type="text"] {
-                width: 100%; /* Full width on mobile */
-                margin-bottom: 10px; /* Spacing below input */
-            }
-
-            .card {
-                width: 100%; /* Full width on mobile */
-                padding: 15px; /* Less padding on mobile */
-            }
-        }
     </style>
 </head>
 <body>
     <h1>Guess the Recipe</h1>
 
-    <div class="card">
-        <div class="dropdown">
-            <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
-            <div id="dropdown-list" class="dropdown-list"></div>
-            <button id="submit-guess">Reveal First Ingredient</button>
-            <button id="hint-button">Get Hint</button>
-            <button id="give-up">Give Up</button>
-        </div>
-        <p id="feedback"></p>
-        <p id="ingredient-hint">Hint: Guess to reveal ingredients!</p>
-        <ul id="ingredient-list"></ul>
+    <div class="dropdown">
+        <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
+        <div id="dropdown-list" class="dropdown-list"></div>
+        <button id="submit-guess">Reveal First Ingredient</button>
+        <button id="hint-button">Get Hint</button>
+        <button id="give-up">Give Up</button>
     </div>
 
-    <div id="result" class="card">
+    <p id="feedback"></p>
+    <p id="ingredient-hint">Hint: Guess to reveal ingredients!</p>
+    
+    <ul id="ingredient-list"></ul>
+
+    <div id="result">
         <h2 id="recipe-name"></h2>
         <img id="recipe-image" alt="Recipe Image">
         <p id="recipe-instructions"></p>
@@ -242,52 +217,95 @@
                     listItem.textContent = `Ingredient: ${inName[ingredientIndex - notInName.length]}`;
                     ingredientList.appendChild(listItem);
                 } else {
-                    feedback.textContent = 'No more ingredients to reveal!';
-                    return;
+                    ingredientHint.textContent = 'No more ingredients! Give your best guess or give up!';
                 }
-                ingredientIndex++; // Move to the next ingredient
+
+                ingredientIndex++;
+                // Change the button text back to "Submit Guess" after the first ingredient is shown
+                if (ingredientIndex === 1) {
+                    submitGuess.textContent = 'Submit Guess';
+                }
             }
 
-            // Reveal first ingredient
-            submitGuess.addEventListener('click', () => {
-                if (currentRecipe) {
-                    if (isFirstReveal) {
-                        displayNextIngredient();
-                        isFirstReveal = false;
-                        submitGuess.textContent = 'Reveal Next Ingredient'; // Change button text after first reveal
+            // Provide an additional hint about the recipe (e.g., category or area)
+            function provideRecipeHint() {
+                const hint = `Hint: This is a ${currentRecipe.strArea} ${currentRecipe.strCategory}.`;
+                ingredientHint.textContent = hint;
+            }
+
+            // Check the player's guess
+            function checkGuess(guess) {
+                if (guess.toLowerCase() === currentRecipe.strMeal.toLowerCase()) {
+                    feedback.textContent = 'Correct! Here is the recipe:';
+                    showRecipe();
+                } else if (ingredientIndex < maxIngredients) {
+                    feedback.textContent = 'Incorrect, try again!';
+                    displayNextIngredient();
+                } else {
+                    feedback.textContent = 'Out of ingredients! Here is the recipe:';
+                    showRecipe();
+                }
+            }
+
+            // Show the recipe details
+            function showRecipe() {
+                recipeNameElem.textContent = currentRecipe.strMeal;
+                recipeImageElem.src = currentRecipe.strMealThumb;
+                recipeInstructionsElem.textContent = currentRecipe.strInstructions;
+                recipeVideoElem.href = currentRecipe.strYoutube;
+                resultDiv.style.display = 'block'; // Show the recipe result
+                ingredientList.innerHTML = ''; // Clear ingredient list
+            }
+
+            // Handle the dropdown search
+            guessInput.addEventListener('input', () => {
+                const query = guessInput.value.toLowerCase();
+                dropdownList.innerHTML = ''; // Clear previous suggestions
+
+                if (query) {
+                    const suggestions = ['Recipe1', 'Recipe2', 'Recipe3']; // Replace with your suggestions logic
+                    suggestions.forEach(item => {
+                        if (item.toLowerCase().includes(query)) {
+                            const suggestionItem = document.createElement('div');
+                            suggestionItem.textContent = item;
+                            suggestionItem.onclick = () => {
+                                guessInput.value = item;
+                                dropdownList.style.display = 'none'; // Hide dropdown on selection
+                            };
+                            dropdownList.appendChild(suggestionItem);
+                        }
+                    });
+
+                    if (dropdownList.innerHTML) {
+                        dropdownList.style.display = 'block'; // Show dropdown if there are suggestions
                     } else {
-                        displayNextIngredient();
+                        dropdownList.style.display = 'none'; // Hide dropdown if no suggestions
                     }
                 } else {
-                    feedback.textContent = 'Please guess a recipe first!';
+                    dropdownList.style.display = 'none'; // Hide dropdown if input is empty
                 }
             });
 
-            // Get hint
-            hintButton.addEventListener('click', () => {
-                if (currentRecipe) {
-                    feedback.textContent = `Hint: The recipe is a ${currentRecipe.strCategory}.`;
+            // Event listeners
+            submitGuess.addEventListener('click', () => {
+                const guess = guessInput.value.trim();
+                if (isFirstReveal) {
+                    displayNextIngredient();
+                    isFirstReveal = false; // Set flag to false after first reveal
                 } else {
-                    feedback.textContent = 'Please guess a recipe first!';
+                    checkGuess(guess);
                 }
+                guessInput.value = ''; // Clear input after guess
+                dropdownList.style.display = 'none'; // Hide dropdown after submitting
             });
 
-            // Give up
+            hintButton.addEventListener('click', provideRecipeHint);
             giveUpButton.addEventListener('click', () => {
-                if (currentRecipe) {
-                    feedback.textContent = `The recipe was: ${currentRecipe.strMeal}`;
-                    recipeNameElem.textContent = currentRecipe.strMeal;
-                    recipeInstructionsElem.textContent = currentRecipe.strInstructions;
-                    recipeImageElem.src = currentRecipe.strMealThumb;
-                    recipeVideoElem.href = currentRecipe.strYoutube;
-                    resultDiv.style.display = 'block';
-                } else {
-                    feedback.textContent = 'Please guess a recipe first!';
-                }
+                feedback.textContent = 'You gave up! Here is the recipe:';
+                showRecipe();
             });
 
-            // Initial fetch
-            fetchRandomRecipe();
+            fetchRandomRecipe(); // Initial fetch
         });
     </script>
 </body>
