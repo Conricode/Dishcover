@@ -23,6 +23,18 @@
             margin-bottom: 20px;
         }
 
+        /* Card Styles */
+        .card {
+            background-color: #f9f9f9; /* Light gray background */
+            border: 1px solid #2e5e2e; /* Forest green border */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px; /* Set max width for cards */
+        }
+
         /* Input and Button Styles */
         .input-container {
             display: flex;
@@ -145,24 +157,25 @@
 <body>
     <h1>Guess the Recipe</h1>
 
-    <div class="dropdown">
-        <div class="input-container">
-            <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
-            <button id="submit-guess">Reveal First Ingredient</button>
+    <div class="card">
+        <div class="dropdown">
+            <div class="input-container">
+                <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
+                <button id="submit-guess">Reveal First Ingredient</button>
+            </div>
+            <div class="button-container">
+                <button id="hint-button">Get Hint</button>
+                <button id="give-up">Give Up</button>
+            </div>
+            <div id="dropdown-list" class="dropdown-list"></div>
         </div>
-        <div class="button-container">
-            <button id="hint-button">Get Hint</button>
-            <button id="give-up">Give Up</button>
-        </div>
-        <div id="dropdown-list" class="dropdown-list"></div>
+        <p id="feedback"></p>
+        <p id="ingredient-hint">Hint: Guess to reveal ingredients!</p>
     </div>
 
-    <p id="feedback"></p>
-    <p id="ingredient-hint">Hint: Guess to reveal ingredients!</p>
-    
-    <ul id="ingredient-list"></ul>
+    <ul id="ingredient-list" class="card"></ul>
 
-    <div id="result">
+    <div id="result" class="card">
         <h2 id="recipe-name"></h2>
         <img id="recipe-image" alt="Recipe Image">
         <p id="recipe-instructions"></p>
@@ -238,89 +251,57 @@
                 } else {
                     ingredientHint.textContent = 'No more ingredients! Give your best guess or give up!';
                 }
-
                 ingredientIndex++;
-                // Change the button text back to "Submit Guess" after the first ingredient is shown
-                if (ingredientIndex === 1) {
-                    submitGuess.textContent = 'Submit Guess';
-                }
             }
 
-            // Provide an additional hint about the recipe (e.g., category or area)
-            function provideRecipeHint() {
-                const hint = `Hint: This is a ${currentRecipe.strArea} ${currentRecipe.strCategory}.`;
-                ingredientHint.textContent = hint;
-            }
-
-            // Check the player's guess
-            function checkGuess(guess) {
-                if (guess.toLowerCase() === currentRecipe.strMeal.toLowerCase()) {
-                    feedback.textContent = 'Correct! Here is the recipe:';
-                    showRecipe();
+            // Check if the guess is correct
+            function checkGuess() {
+                const guess = guessInput.value.trim().toLowerCase();
+                if (guess === currentRecipe.strMeal.toLowerCase()) {
+                    feedback.textContent = 'Correct! You guessed the recipe!';
+                    displayResult();
                 } else {
-                    feedback.textContent = 'Incorrect guess, try again!';
+                    feedback.textContent = 'Try again or get a hint!';
                 }
+                guessInput.value = ''; // Clear input
             }
 
-            // Show the recipe details
-            function showRecipe() {
+            // Handle button click events
+            submitGuess.addEventListener('click', () => {
+                if (isFirstReveal) {
+                    displayNextIngredient();
+                    isFirstReveal = false; // After the first reveal, set flag to false
+                    submitGuess.textContent = 'Submit Guess'; // Change button text for submission
+                } else {
+                    checkGuess();
+                }
+            });
+
+            // Provide a hint
+            hintButton.addEventListener('click', () => {
+                feedback.textContent = `Hint: The recipe name starts with "${currentRecipe.strMeal.charAt(0)}".`;
+            });
+
+            // Give up and show the answer
+            giveUpButton.addEventListener('click', () => {
+                feedback.textContent = `You gave up! The recipe was "${currentRecipe.strMeal}".`;
+                displayResult();
+            });
+
+            // Display the result of the game
+            function displayResult() {
+                resultDiv.style.display = 'block'; // Show result section
                 recipeNameElem.textContent = currentRecipe.strMeal;
                 recipeImageElem.src = currentRecipe.strMealThumb;
                 recipeInstructionsElem.textContent = currentRecipe.strInstructions;
-                recipeVideoElem.href = currentRecipe.strYoutube;
-                resultDiv.style.display = 'block'; // Show the recipe result
-                ingredientList.innerHTML = ''; // Clear ingredient list
+                recipeVideoElem.href = currentRecipe.strYoutube; // Set link to video
+                guessInput.disabled = true; // Disable input after game ends
+                submitGuess.disabled = true; // Disable guess button
+                hintButton.disabled = true; // Disable hint button
+                giveUpButton.disabled = true; // Disable give up button
             }
 
-            // Handle the dropdown search
-            guessInput.addEventListener('input', () => {
-                const query = guessInput.value.toLowerCase();
-                dropdownList.innerHTML = ''; // Clear previous suggestions
-
-                if (query) {
-                    const suggestions = ['Recipe1', 'Recipe2', 'Recipe3']; // Replace with your suggestions logic
-                    suggestions.forEach(item => {
-                        if (item.toLowerCase().includes(query)) {
-                            const suggestionItem = document.createElement('div');
-                            suggestionItem.textContent = item;
-                            suggestionItem.onclick = () => {
-                                guessInput.value = item;
-                                dropdownList.style.display = 'none'; // Hide dropdown on selection
-                            };
-                            dropdownList.appendChild(suggestionItem);
-                        }
-                    });
-
-                    if (dropdownList.innerHTML) {
-                        dropdownList.style.display = 'block'; // Show dropdown if there are suggestions
-                    } else {
-                        dropdownList.style.display = 'none'; // Hide dropdown if no suggestions
-                    }
-                } else {
-                    dropdownList.style.display = 'none'; // Hide dropdown if input is empty
-                }
-            });
-
-            // Event listeners
-            submitGuess.addEventListener('click', () => {
-                const guess = guessInput.value.trim();
-                if (isFirstReveal) {
-                    displayNextIngredient();
-                    isFirstReveal = false; // Set flag to false after first reveal
-                } else {
-                    checkGuess(guess);
-                }
-                guessInput.value = ''; // Clear input after guess
-                dropdownList.style.display = 'none'; // Hide dropdown after submitting
-            });
-
-            hintButton.addEventListener('click', provideRecipeHint);
-            giveUpButton.addEventListener('click', () => {
-                feedback.textContent = 'You gave up! Here is the recipe:';
-                showRecipe();
-            });
-
-            fetchRandomRecipe(); // Initial fetch
+            fetchRandomRecipe(); // Start the game
         });
     </script>
 </body>
