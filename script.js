@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let ingredients = []; // Array of ingredients for the current recipe
     let guessedRecipes = new Set(); // Track guessed recipes
     let revealedIngredients = 0; // Tracks how many ingredients have been revealed
+    let usedHint = false;
 
     // Fetch and load a random recipe
     function loadRandomRecipe() {
@@ -37,9 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Loaded Recipe:", currentRecipe);
                     console.log("Ingredients:", ingredients);
 
-                    // Display a hint about the recipe
-                    const hint = `This recipe is a ${currentRecipe.strArea} dish in the ${currentRecipe.strCategory} category.`;
-                    hintText.textContent = `Hint: ${hint}`;
                 } else {
                     console.error('No meals found.');
                 }
@@ -105,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ingredientList.innerHTML = ''; // Clear the ingredient list
         guessedRecipes.clear();
         revealedIngredients = 0;
+        usedHint = false;
 
         loadRandomRecipe();
         showIngredientList();
@@ -138,6 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
             feedback.textContent = 'Incorrect guess!';
             revealNextIngredient();
         }
+    });
+
+    hintButton.addEventListener('click', () => {
+        // Display a hint about the recipe
+        const hint = `This recipe is a ${currentRecipe.strArea} dish in the ${currentRecipe.strCategory} category.`;
+        hintText.textContent = `Hint: ${hint}`;
+        usedHint = true
     });
 
     // Event listener for the "Give Up" button

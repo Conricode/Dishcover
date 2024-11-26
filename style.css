@@ -1,16 +1,18 @@
 /* Define the colour palette */
 :root {
-    --background-color: #d3af5e; /* Sandy gold */
-    --text-color: white;        /* White text */
+    --background-color: white; /* Sandy gold */
+    --title-text-color: black;
+    --text-color: black;        /* White text */
+    --hint-text-color: #2e5e2e; 
     --button-bg: #2e5e2e;       /* Dark green button background */
     --button-hover-bg: #264a26; /* Darker green for hover state */
-    --alt-button-bg: gray;
-    --alt-button-hover-bg: rgb(100, 100, 100);
-    --input-bg: black;        /* Dark green input background */
-    --input-placeholder: white; /* Sandy placeholder text */
-    --card-bg: black;           /* Black for cards */
-    --border-color: white;      /* White borders */
-    --overlay-bg: black; /* Semi-transparent black */
+    --alt-button-bg: #d3af5e;
+    --alt-button-hover-bg: #d3af5e;
+    --input-bg: white;        /* Dark green input background */
+    --input-placeholder: black; /* Sandy placeholder text */
+    --card-bg: white;           /* Black for cards */
+    --border-color: #d3af5e;      /* White borders */
+    --overlay-bg: #d3af5e; /* Semi-transparent black */
 }
 
 /* General styles remain the same */
@@ -26,7 +28,7 @@ body {
 }
 
 h1 {
-    color: var(--text-color);
+    color: var(--title-text-color);
     margin-bottom: 20px;
     text-align: center;
 }
@@ -73,7 +75,7 @@ h1 {
 
 button {
     background-color: var(--button-bg);
-    color: var(--text-color);
+    color: var(--background-color);
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
@@ -83,7 +85,7 @@ button {
 }
 #hint-button {
     background-color: var(--alt-button-bg);
-    color: var(--text-color);
+    color: var(--background-color);
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
@@ -93,7 +95,7 @@ button {
 }
 #give-up {
     background-color: var(--alt-button-bg);
-    color: var(--text-color);
+    color: var(--background-color);
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
@@ -135,7 +137,7 @@ button:hover {
     margin-left: 15px; /* Optional: Add spacing to align with buttons */
     padding: 0 10px; /* Add padding inside the hint container */
     background-color: var(--input-bg); /* Use text color for background */
-    color: var(--background-color); /* Reverse text and background color */
+    color: var(--hint-text-color); /* Reverse text and background color */
     border-radius: 5px;
     flex-grow: 1; /* Allow the hint to expand and fill remaining space */
     text-align: left; /* Align text to the left for better readability */
