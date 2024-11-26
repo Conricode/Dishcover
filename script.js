@@ -1,149 +1,217 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe Guessing Game</title>
-    <style>
-        /* Simple styling for the game */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+document.addEventListener('DOMContentLoaded', () => {
+    const apiKey = '1'; // API key for TheMealDB
+    const guessInput = document.getElementById('guess-input');
+    const submitGuessButton = document.getElementById('submit-guess');
+    const feedback = document.getElementById('feedback');
+    const ingredientList = document.getElementById('ingredient-list');
+    const hintText = document.getElementById('ingredient-hint');
+    const hintButton = document.getElementById('hint-button');
+    const giveUpButton = document.getElementById('give-up');
+
+    const modal = document.getElementById('result-modal');
+    const overlay = document.getElementById('overlay');
+    const closeModalButton = document.getElementById('close-modal');
+    const expandModalButton = document.getElementById('expand-modal');
+    const recipeName = document.getElementById('recipe-name');
+    const recipeImage = document.getElementById('recipe-image');
+    const recipeInstructions = document.getElementById('recipe-instructions');
+    const recipeVideo = document.getElementById('recipe-video');
+
+    const carouselLeft = document.getElementById('carousel-left');
+    const carouselRight = document.getElementById('carousel-right');
+
+    let currentRecipe = null; // Stores the current recipe
+    let ingredients = []; // Array of ingredients for the current recipe
+    let guessedRecipes = new Set(); // Track guessed recipes
+    let revealedIngredients = 0; // Tracks how many ingredients have been revealed
+
+    // Fetch and load a random recipe
+    function loadRandomRecipe() {
+        fetch('https://www.themealdb.com/api/json/v1/1/random.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.meals && data.meals.length > 0) {
+                    currentRecipe = data.meals[0];
+                    ingredients = getIngredients(currentRecipe);
+
+                    console.log("Loaded Recipe:", currentRecipe);
+                    console.log("Ingredients:", ingredients);
+
+                    // Display a hint about the recipe
+                    const hint = `This recipe is a ${currentRecipe.strArea} dish in the ${currentRecipe.strCategory} category.`;
+                    hintText.textContent = `Hint: ${hint}`;
+                } else {
+                    console.error('No meals found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching recipe:', error);
+            });
+    }
+
+    // Extract ingredients from the recipe
+    function getIngredients(recipe) {
+        const ingredientArray = [];
+        for (let i = 1; i <= 20; i++) {
+            const ingredient = recipe[`strIngredient${i}`];
+            const measure = recipe[`strMeasure${i}`];
+            if (ingredient) {
+                ingredientArray.push(`${ingredient} (${measure})`);
+            }
         }
-        #result {
-            display: none;
+        return ingredientArray;
+    }
+
+    // Reveal the next ingredient in the list
+    function revealNextIngredient() {
+        if (revealedIngredients < ingredients.length) {
+            const ingredientItem = document.createElement('li');
+            ingredientItem.textContent = ingredients[revealedIngredients];
+            ingredientList.appendChild(ingredientItem);
+            revealedIngredients++;
+        } else {
+            feedback.textContent = 'No more ingredients to reveal!';
         }
-        #ingredient-list {
-            margin-top: 20px;
+    }
+
+    // Populate the modal with recipe details
+    function populateModal(recipe) {
+        recipeName.textContent = recipe.strMeal;
+        recipeImage.src = recipe.strMealThumb;
+        recipeImage.alt = recipe.strMeal;
+        recipeInstructions.textContent = recipe.strInstructions;
+        recipeVideo.href = recipe.strYoutube;
+        recipeVideo.style.display = recipe.strYoutube ? 'block' : 'none';
+
+        // Reset modal state
+        recipeInstructions.style.display = 'none';
+        expandModalButton.style.display = 'block';
+
+        // Show the modal
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+    }
+
+    // Close the modal
+    function closeModal() {
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+    }
+
+    // Reset the game state
+    function resetGame() {
+        guessInput.value = '';
+        feedback.textContent = '';
+        ingredientList.innerHTML = ''; // Clear the ingredient list
+        guessedRecipes.clear();
+        revealedIngredients = 0;
+
+        loadRandomRecipe();
+        showIngredientList();
+        closeModal();
+    }
+
+    // Check the user's guess
+    function checkGuess(guess) {
+        if (!currentRecipe) return false;
+        return guess.toLowerCase() === currentRecipe.strMeal.toLowerCase();
+    }
+
+    // Event listener for submitting a guess
+    submitGuessButton.addEventListener('click', () => {
+        const guess = guessInput.value.trim();
+        if (!guess) {
+            feedback.textContent = 'Cannot enter an empty guess!';
+            return;
         }
-        #ingredient-list li {
-            margin: 5px 0;
+        if (guessedRecipes.has(guess.toLowerCase())) {
+            feedback.textContent = 'You have already guessed this!';
+            return;
         }
-    </style>
-</head>
-<body>
-    <h1>Guess the Recipe</h1>
 
-    <div>
-        <input type="text" id="guess-input" placeholder="Enter your guess here...">
-        <button id="submit-guess">Submit Guess</button>
-        <button id="hint-button">Get Hint</button>
-        <button id="give-up">Give Up</button>
-    </div>
+        guessedRecipes.add(guess.toLowerCase());
 
-    <p id="feedback"></p>
-    <p id="ingredient-hint">Hint: Guess to reveal ingredients!</p>
-    
-    <ul id="ingredient-list"></ul>
+        if (checkGuess(guess)) {
+            feedback.textContent = 'Correct! Well done!';
+            populateModal(currentRecipe); // Show modal with recipe details
+        } else {
+            feedback.textContent = 'Incorrect guess!';
+            revealNextIngredient();
+        }
+    });
 
-    <div id="result">
-        <h2 id="recipe-name"></h2>
-        <img id="recipe-image" alt="Recipe Image">
-        <p id="recipe-instructions"></p>
-        <a id="recipe-video" target="_blank">Watch Video</a>
-    </div>
+    // Event listener for the "Give Up" button
+    giveUpButton.addEventListener('click', () => {
+        feedback.textContent = `The correct recipe was: ${currentRecipe.strMeal}`;
+        populateModal(currentRecipe); // Show modal with recipe details
+    });
 
-    <script>
-        const apiKey = '1';  // You can register at themealdb.com to get an API key
-        let currentRecipe = null;
-        let ingredientIndex = 0;
-        let maxIngredients = 20;
+    // Event listener for closing the modal
+    closeModalButton.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const submitGuess = document.getElementById('submit-guess');
-            const guessInput = document.getElementById('guess-input');
-            const feedback = document.getElementById('feedback');
-            const ingredientHint = document.getElementById('ingredient-hint');
-            const ingredientList = document.getElementById('ingredient-list');
-            const resultDiv = document.getElementById('result');
-            const recipeNameElem = document.getElementById('recipe-name');
-            const recipeImageElem = document.getElementById('recipe-image');
-            const recipeInstructionsElem = document.getElementById('recipe-instructions');
-            const recipeVideoElem = document.getElementById('recipe-video');
-            const hintButton = document.getElementById('hint-button');
-            const giveUpButton = document.getElementById('give-up');
+    // Event listener for expanding the modal
+    expandModalButton.addEventListener('click', () => {
+        recipeInstructions.style.display = 'block';
+        expandModalButton.style.display = 'none';
+    });
+    function showIngredientList() {
+        ingredientList.classList.add('show');
+    }
+    // Fetch and populate carousels
+    async function populateCarousels() {
+        try {
+            const response = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s='); // Fetch all recipes
+            const data = await response.json();
 
-            // Fetch a random recipe from TheMealDB
-            function fetchRandomRecipe() {
-                fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
-                    .then(response => response.json())
-                    .then(data => {
-                        currentRecipe = data.meals[0];
-                        ingredientIndex = 0;
-                        displayNextIngredient();
-                    })
-                    .catch(error => {
-                        console.error('Error fetching recipe:', error);
+            if (data.meals) {
+                const meals = data.meals;
+
+                // Create wrapper for the carousel images
+                const leftWrapper = document.createElement('div');
+                leftWrapper.classList.add('carousel-wrapper');
+
+                const rightWrapper = document.createElement('div');
+                rightWrapper.classList.add('carousel-wrapper');
+
+                // Add images to the wrapper
+                function addImages(wrapper) {
+                    meals.forEach(meal => {
+                        const img = document.createElement('img');
+                        img.src = meal.strMealThumb;
+                        img.alt = meal.strMeal;
+                        wrapper.appendChild(img);
                     });
-            }
-
-            // Display the next ingredient and keep it on the screen
-            function displayNextIngredient() {
-                if (ingredientIndex < maxIngredients && currentRecipe[`strIngredient${ingredientIndex + 1}`]) {
-                    const ingredient = currentRecipe[`strIngredient${ingredientIndex + 1}`];
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Ingredient ${ingredientIndex + 1}: ${ingredient}`;
-                    ingredientList.appendChild(listItem);
-                    ingredientIndex++;
-                } else {
-                    ingredientHint.textContent = 'No more ingredients! Give your best guess or give up!';
                 }
+
+                // Add images to both carousels
+                addImages(leftWrapper);
+                addImages(rightWrapper);
+
+                // Add the first wrapper to the left carousel
+                carouselLeft.appendChild(leftWrapper);
+
+                // Create clone of leftWrapper and append it to make the loop seamless
+                const leftClone = leftWrapper.cloneNode(true);
+                carouselLeft.appendChild(leftClone);
+
+                // Add the second wrapper to the right carousel
+                carouselRight.appendChild(rightWrapper);
+
+                // Create clone of rightWrapper and append it to make the loop seamless
+                const rightClone = rightWrapper.cloneNode(true);
+                carouselRight.appendChild(rightClone);
             }
+        } catch (error) {
+            console.error('Error fetching recipes for carousel:', error);
+        }
+    }
 
-            // Provide an additional hint about the recipe (e.g., category or area)
-            function provideRecipeHint() {
-                const hint = `Hint: This is a ${currentRecipe.strArea} ${currentRecipe.strCategory}.`;
-                ingredientHint.textContent = hint;
-            }
+    // Call the function to populate carousels
+    populateCarousels();
+    
 
-            // Check the player's guess
-            function checkGuess(guess) {
-                if (guess.toLowerCase() === currentRecipe.strMeal.toLowerCase()) {
-                    feedback.textContent = 'Correct! Here is the recipe:';
-                    showRecipe();
-                } else if (ingredientIndex < maxIngredients) {
-                    feedback.textContent = 'Incorrect, try again!';
-                    displayNextIngredient();
-                } else {
-                    feedback.textContent = 'Out of ingredients! Here is the recipe:';
-                    showRecipe();
-                }
-            }
-
-            // Show the full recipe if the player wins or gives up
-            function showRecipe() {
-                resultDiv.style.display = 'block';
-                recipeNameElem.textContent = currentRecipe.strMeal;
-                recipeImageElem.src = currentRecipe.strMealThumb;
-                recipeInstructionsElem.textContent = currentRecipe.strInstructions;
-                recipeVideoElem.href = currentRecipe.strYoutube;
-                recipeVideoElem.textContent = 'Watch Video';
-                guessInput.disabled = true;
-                submitGuess.disabled = true;
-                hintButton.disabled = true;
-                giveUpButton.disabled = true;
-            }
-
-            // Handle the guess submission
-            submitGuess.addEventListener('click', () => {
-                const guess = guessInput.value;
-                if (guess) {
-                    checkGuess(guess);
-                }
-            });
-
-            // Provide a hint when the hint button is clicked
-            hintButton.addEventListener('click', provideRecipeHint);
-
-            // Give up and show the recipe
-            giveUpButton.addEventListener('click', () => {
-                feedback.textContent = 'You gave up! Here is the recipe:';
-                showRecipe();
-            });
-
-            // Fetch a recipe on page load
-            fetchRandomRecipe();
-        });
-    </script>
-</body>
-</html>
+    
+    // Initialise the game
+    resetGame();
+});

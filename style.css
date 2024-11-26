@@ -1,70 +1,253 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 0;
+/* Define the colour palette */
+:root {
+    --background-color: #d3af5e; /* Sandy gold */
+    --text-color: white;        /* White text */
+    --button-bg: #2e5e2e;       /* Dark green button background */
+    --button-hover-bg: #264a26; /* Darker green for hover state */
+    --alt-button-bg: gray;
+    --alt-button-hover-bg: rgb(100, 100, 100);
+    --input-bg: black;        /* Dark green input background */
+    --input-placeholder: white; /* Sandy placeholder text */
+    --card-bg: black;           /* Black for cards */
+    --border-color: white;      /* White borders */
+    --overlay-bg: black; /* Semi-transparent black */
 }
 
-.container {
-    text-align: center;
-    max-width: 600px;
-    margin: 100px auto;
-    background-color: #fff;
+/* General styles remain the same */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-color);
 }
 
 h1 {
-    color: #333;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-input[type="text"] {
+/* Game container styling */
+#game-container {
+    max-width: 500px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    color: var(--text-color);
+    text-align: center;
+}
+
+/* Input and button styling */
+.input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#guess-input {
+    flex: 1;
     padding: 10px;
-    width: 80%;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    font-size: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+#guess-input::placeholder {
+    color: var(--input-placeholder);
 }
 
 button {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
+    font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#hint-button {
+    background-color: var(--alt-button-bg);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#give-up {
+    background-color: var(--alt-button-bg);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: var(--button-hover-bg);
 }
 
-#feedback {
-    margin-top: 20px;
-    font-weight: bold;
+/* Button container styling */
+/* .button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+} */
+.button-container {
+    display: flex;
+    align-items: center; /* Align buttons and text vertically */
+    gap: 10px; /* Add space between the buttons and hint */
+    justify-content: flex
 }
 
-#result {
-    margin-top: 40px;
+.button-container button {
+    height: 40px; /* Match the height of the hint */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px; /* Adjust padding for consistent sizing */
+    font-size: 16px;
 }
 
-#result img {
+#ingredient-hint {
+    display: inline-flex;
+    align-items: center;
+    height: 40px; /* Match button height */
+    margin-left: 15px; /* Optional: Add spacing to align with buttons */
+    padding: 0 10px; /* Add padding inside the hint container */
+    background-color: var(--input-bg); /* Use text color for background */
+    color: var(--background-color); /* Reverse text and background color */
+    border-radius: 5px;
+    flex-grow: 1; /* Allow the hint to expand and fill remaining space */
+    text-align: left; /* Align text to the left for better readability */
+    font-size: x-small;
+}
+
+#ingredient-list{
+    display: none;
+}
+
+#ingredient-list.show{
+    display: block;
+}
+
+
+
+/* Modal styles */
+#result-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+    color: var(--text-color);
+}
+
+#modal-content {
+    text-align: center;
+}
+
+#modal-content img {
     width: 100%;
-    max-width: 300px;
-    margin-top: 20px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
 }
 
-#recipe-video {
-    display: inline-block;
-    margin-top: 20px;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
-    text-decoration: none;
+#modal-content button {
+    margin-top: 10px;
 }
 
-#recipe-video:hover {
-    background-color: #0056b3;
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--overlay-bg);
+    z-index: 999;
+    display: none;
 }
+
+/* Full-screen carousel container */
+.carousel {
+    position: fixed;
+    top: 0; /* Aligns the carousel to the top of the screen */
+    width: 250px; /* Adjust the width of the carousel (increased from 150px) */
+    height: 100vh; /* Full viewport height */
+    overflow: hidden; /* Prevents any content from overflowing */
+    z-index: 100;
+    margin-left: 60px; /* Same as game card margin */
+    margin-right: 60px; /* Same as game card margin */
+}
+
+/* Left carousel */
+#carousel-left {
+    left: 0; /* Position on the left side */
+    background-color: rgba(0, 0, 0, 0.1); /* Optional background color */
+}
+
+/* Right carousel */
+#carousel-right {
+    right: 0; /* Position on the right side */
+    background-color: rgba(0, 0, 0, 0.1); /* Optional background color */
+}
+
+/* Wrapper for images */
+.carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+    height: 100%; /* Full height of the carousel */
+    width: 100%;
+    animation: scroll 15s linear infinite; /* Continuous scrolling animation */
+}
+
+/* Individual image styles */
+.carousel-wrapper img {
+    width: 100%; /* Full width of the carousel container */
+    height: 100%; /* Full height of the carousel container */
+    object-fit: cover; /* Ensures images maintain their aspect ratio without distortion */
+    margin: 0; /* Removes any margins between images */
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional styling */
+}
+
+/* Animation for continuous scroll */
+@keyframes scroll {
+    0% {
+        transform: translateY(0); /* Start at the top */
+    }
+    100% {
+        transform: translateY(-100%); /* Scroll to the next image */
+    }
+}
+

@@ -1,358 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5014888736708146" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Guessing Game</title>
-    <style>
-        /* General styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: white; /* White background */
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #2e5e2e; /* Forest green text */
-        }
-
-        h1 {
-            color: #2e5e2e; /* Forest green */
-            margin-bottom: 20px;
-        }
-
-        /* Card styles */
-        .card {
-            background-color: #f9f9f9;
-            border: 1px solid #2e5e2e; /* Forest green */
-            border-radius: 5px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 300px; /* Set a width for the cards */
-        }
-
-        /* Input and Button Styles */
-        .input-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #2e5e2e; /* Forest green border */
-            border-radius: 5px;
-            margin-right: 10px;
-            width: 200px; /* Adjust input width */
-            height: 40px; /* Set height for uniformity */
-        }
-
-        button {
-            background-color: #cba560; /* Button color */
-            color: white; /* White text */
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            height: 40px; /* Set height to match input */
-        }
-
-        button:hover {
-            background-color: #b39a50; /* Darker beige on hover */
-        }
-
-        /* Feedback and hints */
-        #feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            color: #2e5e2e; /* Forest green */
-        }
-
-        /* Ingredient List */
-        #ingredient-list {
-            margin-top: 20px;
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #ingredient-list li {
-            background-color: #e0f2e9; /* Light green */
-            border: 1px solid #2e5e2e; /* Forest green border */
-            border-radius: 5px;
-            padding: 10px;
-            margin: 5px 0;
-            transition: background-color 0.3s ease;
-        }
-
-        #ingredient-list li:hover {
-            background-color: #d3e4db; /* Lighter green on hover */
-        }
-
-        /* Result Section */
-        #result {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        #recipe-image {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        a {
-            color: #2e5e2e; /* Forest green for links */
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Dropdown styles */
-        .dropdown {
-            position: relative;
-            width: 200px; /* Adjusted for uniformity */
-        }
-
-        .dropdown-list {
-            position: absolute;
-            border: 1px solid #2e5e2e; /* Forest green */
-            background: white;
-            z-index: 1000;
-            width: 100%;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-            border-radius: 5px;
-        }
-
-        .dropdown-list div {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .dropdown-list div:hover {
-            background-color: #d3e4db; /* Lighter green on hover */
-        }
-
-        /* Button Container */
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Guess the Recipe</h1>
+    <div id="carousel-left" class="carousel"></div>
+    <!-- Game Container -->
+    <div id="game-container">
 
-    <div class="card">
-        <div class="input-container">
-            <input type="text" id="guess-input" placeholder="Enter your guess here..." autocomplete="off">
-            <button id="submit-guess">Submit</button>
+        <div class="card">
+            <h1>Guess the Recipe</h1>
+            <div class="input-container">
+                <input type="text" id="guess-input" list="guess-dropdown" placeholder="Start typing a recipe...">
+                <datalist id="guess-dropdown"></datalist>
+                <button id="submit-guess">Submit</button>
+            </div>
+
+            <div class="button-container">
+                <button id="hint-button">Get Hint</button>
+                <button id="give-up">Give Up</button>
+                <p id="ingredient-hint" class="card">Hint: </p>
+            </div>
+            <p id="feedback" class="card"></p>
         </div>
-        <div class="dropdown-list" id="dropdown-list"></div>
-        <div class="button-container">
-            <button id="hint-button">Get Hint</button>
-            <button id="give-up">Give Up</button>
+
+        
+        
+
+        <ul id="ingredient-list" class="card"></ul>
+    </div>
+
+    <div id="carousel-right" class="carousel"></div>
+
+    <!-- Overlay for the modal -->
+    <div id="overlay"></div>
+
+    <!-- Recipe Modal -->
+    <div id="result-modal">
+        <button id="close-modal">Close</button>
+        <div id="modal-content" class="collapsed">
+            <h2 id="recipe-name"></h2>
+            <img id="recipe-image" alt="Recipe image">
+            <button id="expand-modal">Show More</button>
+            <p id="recipe-instructions" style="display: none;"></p>
+            <a id="recipe-video" href="#" target="_blank" style="display: none;">Watch Video</a>
         </div>
     </div>
 
-    <p id="feedback" class="card"></p>
-    <p id="ingredient-hint" class="card">Hint: Guess to reveal ingredients!</p>
-    
-    <ul id="ingredient-list" class="card"></ul>
-
-    <div id="result" class="card">
-        <h2 id="recipe-name"></h2>
-        <img id="recipe-image" alt="Recipe Image">
-        <pre id="recipe-instructions"></pre>
-        <a id="recipe-video" target="_blank">Watch Video</a>
-    </div>
-
-    <script>
-        const apiKey = '1';  // You can register at themealdb.com to get an API key
-        let currentRecipe = null;
-        let ingredientIndex = 0;
-        let maxIngredients = 20;
-        let guessedRecipes = new Set(); // Track guessed recipes
-        let isFirstReveal = true; // Flag to check if it's the first reveal
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const submitGuess = document.getElementById('submit-guess');
-            const guessInput = document.getElementById('guess-input');
-            const feedback = document.getElementById('feedback');
-            const ingredientHint = document.getElementById('ingredient-hint');
-            const ingredientList = document.getElementById('ingredient-list');
-            const resultDiv = document.getElementById('result');
-            const recipeNameElem = document.getElementById('recipe-name');
-            const recipeImageElem = document.getElementById('recipe-image');
-            const recipeInstructionsElem = document.getElementById('recipe-instructions');
-            const recipeVideoElem = document.getElementById('recipe-video');
-            const hintButton = document.getElementById('hint-button');
-            const giveUpButton = document.getElementById('give-up');
-            const dropdownList = document.getElementById('dropdown-list');
-
-            // Fetch a random recipe from TheMealDB
-            function fetchRandomRecipe() {
-                fetch(`https://www.themealdb.com/api/json/v1/1/random.php`)
-                    .then(response => response.json())
-                    .then(data => {
-                        currentRecipe = data.meals[0];
-                        ingredientIndex = 0;
-                        ingredientList.innerHTML = ''; // Clear previous ingredients
-                        feedback.textContent = ''; // Clear feedback
-                        ingredientHint.textContent = 'Hint: Guess to reveal ingredients!';
-                        dropdownList.style.display = 'none'; // Hide dropdown
-                        guessedRecipes.clear(); // Clear guessed recipes for new round
-
-                        // Show the first ingredient immediately
-                        displayNextIngredient();
-                    })
-                    .catch(error => {
-                        console.error('Error fetching recipe:', error);
-                    });
-            }
-
-            // Display the next ingredient
-            function displayNextIngredient() {
-                if (ingredientIndex < maxIngredients) {
-                    const ingredientName = currentRecipe.strMeal.toLowerCase();
-                    let ingredients = [];
-
-                    // Collecting ingredients
-                    for (let i = 0; i < maxIngredients; i++) {
-                        const ingredient = currentRecipe[`strIngredient${i + 1}`];
-                        if (ingredient) {
-                            ingredients.push(ingredient);
-                        }
-                    }
-
-                    // Filter ingredients
-                    const notInName = ingredients.filter(ing => !ingredientName.includes(ing.toLowerCase()));
-                    const inName = ingredients.filter(ing => ingredientName.includes(ing.toLowerCase()));
-
-                    // Show next ingredient
-                    let listItem;
-                    if (ingredientIndex < notInName.length) {
-                        listItem = document.createElement('li');
-                        listItem.textContent = `Ingredient: ${notInName[ingredientIndex]}`;
-                    } else if (ingredientIndex - notInName.length < inName.length) {
-                        listItem = document.createElement('li');
-                        listItem.textContent = `Ingredient: ${inName[ingredientIndex - notInName.length]}`;
-                    }
-                    if (listItem) ingredientList.appendChild(listItem);
-
-                    // Update the ingredient index
-                    ingredientIndex++;
-                }
-            }
-
-            // Fetch all recipes for the dropdown
-            function fetchAllRecipes() {
-                fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Store all recipes for future searches
-                        const recipes = data.meals.map(meal => meal.strMeal.toLowerCase());
-                        setupInputListener(recipes);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching recipes:', error);
-                    });
-            }
-
-            // Set up input listener for filtering recipes
-            function setupInputListener(recipes) {
-                guessInput.addEventListener('input', () => {
-                    const inputValue = guessInput.value.toLowerCase();
-                    dropdownList.innerHTML = ''; // Clear previous suggestions
-
-                    if (inputValue) {
-                        const filteredRecipes = recipes.filter(recipe => recipe.includes(inputValue));
-                        filteredRecipes.forEach(recipe => {
-                            const div = document.createElement('div');
-                            div.textContent = recipe.charAt(0).toUpperCase() + recipe.slice(1); // Capitalize first letter
-                            div.addEventListener('click', () => {
-                                guessInput.value = recipe; // Set input value to clicked recipe
-                                dropdownList.style.display = 'none'; // Hide dropdown after selection
-                            });
-                            dropdownList.appendChild(div);
-                        });
-                        dropdownList.style.display = filteredRecipes.length > 0 ? 'block' : 'none'; // Show or hide dropdown
-                    } else {
-                        dropdownList.style.display = 'none'; // Hide if input is empty
-                    }
-                });
-            }
-
-            // Handle guess submission
-            submitGuess.addEventListener('click', () => {
-                const guess = guessInput.value.trim().toLowerCase();
-                if (guess) {
-                    if (guessedRecipes.has(guess)) {
-                        feedback.textContent = 'You already guessed that recipe.';
-                    } else {
-                        guessedRecipes.add(guess);
-
-                        if (guess === currentRecipe.strMeal.toLowerCase()) {
-                            feedback.textContent = `Congratulations! You guessed it right! It's "${currentRecipe.strMeal}".`;
-                            // Display the recipe instructions and image
-                            displayRecipeResult();
-                        } else {
-                            feedback.textContent = 'Incorrect guess. Try again!';
-                            // Display the next ingredient
-                            displayNextIngredient();
-                        }
-                    }
-                }
-                guessInput.value = ''; // Clear input after submission
-                dropdownList.style.display = 'none'; // Hide dropdown on submission
-            });
-
-            // Display the recipe result
-            function displayRecipeResult() {
-                recipeNameElem.textContent = currentRecipe.strMeal;
-                recipeImageElem.src = currentRecipe.strMealThumb;
-                recipeInstructionsElem.textContent = currentRecipe.strInstructions.replace(/\\n/g, '\n');
-                recipeVideoElem.href = currentRecipe.strYoutube;
-                resultDiv.style.display = 'block'; // Show the result card
-                document.getElementById('ingredient-hint').style.display = 'none'; // Hide hint after guess
-            }
-
-            // Get hint for the recipe
-            hintButton.addEventListener('click', () => {
-                if (currentRecipe) {
-                    if (isFirstReveal) {
-                        ingredientHint.textContent = `Hint: The first ingredient is ${currentRecipe[`strIngredient1`]}.`;
-                        isFirstReveal = false; // Set flag to false after first reveal
-                    } else {
-                        ingredientHint.textContent = 'No more hints available!';
-                    }
-                }
-            });
-
-            // Handle give-up action
-            giveUpButton.addEventListener('click', () => {
-                feedback.textContent = `The recipe was "${currentRecipe.strMeal}".`;
-                displayRecipeResult(); // Show the recipe result
-            });
-
-            // Start the game by fetching a random recipe and all recipes for dropdown
-            fetchRandomRecipe();
-            fetchAllRecipes(); // Fetch all recipes for the dropdown
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
