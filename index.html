@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="carousel-left" class="carousel"></div>
+    <!-- <div id="carousel-left" class="carousel"></div> -->
     <!-- Game Container -->
     <div id="game-container">
 
@@ -28,23 +28,26 @@
         </div>
 
         
-        
-
-        <ul id="ingredient-list" class="card"></ul>
+        <div>
+            <!-- <h3>Ingredients</h3> -->
+            <ul id="ingredient-list" class="card"></ul>
+        </div>
     </div>
 
-    <div id="carousel-right" class="carousel"></div>
+    <!-- <div id="carousel-right" class="carousel"></div> -->
 
     <!-- Overlay for the modal -->
     <div id="overlay"></div>
 
     <!-- Recipe Modal -->
     <div id="result-modal">
-        <button id="close-modal">Close</button>
+        
         <div id="modal-content" class="collapsed">
             <h2 id="recipe-name"></h2>
             <img id="recipe-image" alt="Recipe image">
-            <button id="expand-modal">Show Recipe</button>
+            <div>
+                <button id="expand-modal">Show Recipe</button>
+            </div>
             <p id="recipe-instructions" style="display: none;"></p>
             <a id="recipe-video" href="#" target="_blank" style="display: none;">Watch Video</a>
         </div>

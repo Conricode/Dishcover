@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Loaded Recipe:", currentRecipe);
                     console.log("Ingredients:", ingredients);
 
+                    populateModal(currentRecipe); // Show modal with recipe details
+
                 } else {
                     console.error('No meals found.');
                 }
@@ -85,11 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
         recipeInstructions.style.display = 'none';
         expandModalButton.style.display = 'block';
 
+    }
+    function showModal() {
         // Show the modal
         modal.style.display = 'block';
         overlay.style.display = 'block';
     }
-
     // Close the modal
     function closeModal() {
         modal.style.display = 'none';
@@ -132,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (checkGuess(guess)) {
             feedback.textContent = 'Correct! Well done!';
-            populateModal(currentRecipe); // Show modal with recipe details
+            showModal();
         } else {
             feedback.textContent = 'Incorrect guess!';
             revealNextIngredient();
@@ -149,12 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for the "Give Up" button
     giveUpButton.addEventListener('click', () => {
         feedback.textContent = `The correct recipe was: ${currentRecipe.strMeal}`;
-        populateModal(currentRecipe); // Show modal with recipe details
+        showModal();
     });
 
     // Event listener for closing the modal
-    closeModalButton.addEventListener('click', closeModal);
-    overlay.addEventListener('click', closeModal);
+    //closeModalButton.addEventListener('click', closeModal);
+    //overlay.addEventListener('click', closeModal);
 
     // Event listener for expanding the modal
     expandModalButton.addEventListener('click', () => {

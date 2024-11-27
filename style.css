@@ -12,7 +12,7 @@
     --input-placeholder: black; /* Sandy placeholder text */
     --card-bg: white;           /* Black for cards */
     --border-color: #d3af5e;      /* White borders */
-    --overlay-bg: #d3af5e; /* Semi-transparent black */
+    --overlay-bg: black; /* Semi-transparent black */
 }
 
 /* General styles remain the same */
@@ -108,6 +108,11 @@ button:hover {
     background-color: var(--button-hover-bg);
 }
 
+#expand-modal{
+    background-color: #d3af5e;
+    color: white;
+}
+
 /* Button container styling */
 /* .button-container {
     display: flex;
@@ -146,10 +151,12 @@ button:hover {
 
 #ingredient-list{
     display: none;
+    height: 200px;
 }
 
 #ingredient-list.show{
     display: block;
+    margin-bottom: auto;
 }
 
 
